@@ -14,7 +14,6 @@ Clone the repository and follow the below instructions
 
 ```
 git clone https://github.com/josh-tf/graylog-mysql-importer
-
 ```
 
 Edit the .env file and then run with `node index.js`
@@ -168,6 +167,9 @@ DB_USER = user
 DB_PASS = password
 DB_NAME = log_history
 DB_TABLE = logs
+
+GRAYLOG_PORT = 127.0.0.1
+GRAYLOG_HOST = 12201
 
 MESSAGE_VERSION = "1.0"
 MESSAGE_HOST =  "legacy_import"

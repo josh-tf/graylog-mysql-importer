@@ -1,4 +1,4 @@
-const mysql = require('mysql2');
+const Db = require('mysql2-async').default;
 const Gelf = require('gelf');
 
 require('dotenv').config();
@@ -6,11 +6,12 @@ require('dotenv').config();
 const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
 // create the connection to database
-let connection = mysql.createConnection({
+const db = new Db({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
+  skiptzfix: true,
 });
 
 // create the gelf connection
@@ -50,20 +51,18 @@ function MessageBuilder(data) {
   return message;
 }
 
-function main() {
+async function main() {
   // get the client
-  connection.query(
-    `SELECT * from ${process.env.DB_NAME}.${process.env.DB_TABLE} LIMIT 100;`,
-    async function (err, results, fields) {
-      // for each log entry, send to Graylog
-      for (const [i, row] of results.entries()) {
-        let message = MessageBuilder(row);
-        gelf.emit('gelf.log', message);
-        console.log(`Processed log entry ${i + 1} of ${results.length}`);
-        await delay(25);
-      }
-    }
-  );
+  const rows = await db.getall(`SELECT * from ${process.env.DB_NAME}.${process.env.DB_TABLE};`);
+
+  for (const [i, row] of rows.entries()) {
+    let message = MessageBuilder(row);
+    gelf.emit('gelf.log', message);
+    console.log(`Processed log entry ${i + 1} of ${rows.length}`);
+    await delay(25);
+  }
+
+  console.log(`Finished processing ${rows.length} log entries`);
 }
 
 main();

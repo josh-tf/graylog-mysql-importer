@@ -14,7 +14,10 @@ Clone the repository and follow the below instructions
 
 ```
 git clone https://github.com/josh-tf/graylog-mysql-importer
+
 ```
+
+Edit the .env file and then run with `node index.js`
 
 <br />
 
@@ -142,8 +145,6 @@ Lets look at an example source database in the current structure:
 | 1   | 11/01/2022 11:11:03 | ran_search | { query: "test"} | some_system |
 | 2   | 11/01/2022 11:11:02 | logged_in  | 123.123.123.123  | some_system |
 
-<br />
-
 Lets import this in to Graylog with a GELF format like this:
 
 ```
@@ -188,3 +189,4 @@ TIMESTAMP_FIELD= unix_time
 - This script is provided as-is but I am happy to help if you run in to trouble, just open a new issue on Github
 - You may need to adjust the delay or run the process in batches (using ranges in the query) depending on the size of your dataset and other conditions
 - If a field has a blank or null value, GELF won't include it on the log entry however some fields are required (short_message, long_message, etc), if these are not provided then a fallback value is used
+- If you are importing a large amount of data and getting memory errors with node, you can try increase the heap size using `node --max-old-space-size=8192 index.js`

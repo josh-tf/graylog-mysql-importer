@@ -51,18 +51,21 @@ function MessageBuilder(data) {
   return message;
 }
 
-async function main() {
+async function processBatch(range_min, range_max) {
   // get the client
-  const rows = await db.getall(`SELECT * from ${process.env.DB_NAME}.${process.env.DB_TABLE};`);
+  const rows = await db.getall(
+    `SELECT * from ${process.env.DB_NAME}.${process.env.DB_TABLE} WHERE id BETWEEN ${range_min} AND ${range_max};`
+  );
 
   for (const [i, row] of rows.entries()) {
     let message = MessageBuilder(row);
     gelf.emit('gelf.log', message);
-    console.log(`Processed log entry ${i + 1} of ${rows.length}`);
-    await delay(25);
+    console.log(`Processed log entry with ID ${row.id} - ${i + 1} of ${rows.length}`);
+    await delay(1);
   }
 
   console.log(`Finished processing ${rows.length} log entries`);
 }
 
-main();
+// edit process range here
+processBatch(1, 1000000);
